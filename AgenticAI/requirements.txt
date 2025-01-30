@@ -16,3 +16,4 @@ huggingface-hub
 sentence_transformers
 google-generativeai
 numpy==1.26.4
+streamlit
