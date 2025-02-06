@@ -30,8 +30,6 @@ db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 
 
 ### custom embedder since default is openAi
-# embedder = MistralEmbedder(api_key=api_key)
-# embedder = OllamaEmbedder(dimensions=4096, model="mxbai-embed-large")
 embedder = SentenceTransformerEmbedder(dimensions=384)
 
 ##### creating the knowledgebase for RAG
@@ -49,44 +47,12 @@ knowledge_base = PDFKnowledgeBase(
 
 
 
-# knowledge_base = PDFUrlKnowledgeBase(
-#     urls=["https://phi-public.s3.amazonaws.com/recipes/ThaiRecipes.pdf"],
-#     vector_db=PgVector2(collection="recipes", db_url=db_url, embedder=embedder)
-# )
-
 #### store the knowledgebase to database
 knowledge_base.load(recreate=True, upsert=True)
 storage=PgAgentStorage(table_name="pdf_assistant",db_url=db_url)
 
 
 #### creating the agent
-
-# def pdf_assistant(new: bool = False, user: str = "user"):
-#     run_id: Optional[str] = None
-
-#     assistant = Agent(
-#         model=Groq(id="llama-3.3-70b-versatile", embedder=embedder),
-#         run_id=run_id,
-#         user_id=user,
-#         knowledge_base=knowledge_base,
-#         storage=storage,
-#         # Show tool calls in the response
-#         show_tool_calls=True,
-#         # Enable the assistant to search the knowledge base
-#         search_knowledge=True,
-#         # Enable the assistant to read the chat history
-#         read_chat_history=True,
-#     )
-#     if run_id is None:
-#         run_id = assistant.run_id
-#         print(f"Started Run: {run_id}\n")
-#     else:
-#         print(f"Continuing Run: {run_id}\n")
-
-#     assistant.cli_app(markdown=True)
-
-# if __name__=="__main__":
-#     typer.run(pdf_assistant)
 
 class Criteria(BaseModel):
     criteria: Optional[str] = Field(..., description="this must be inclusion and exclusion criteria from the document")
@@ -150,8 +116,6 @@ class Protocol2querygenerator(Workflow):
     def _get_content(self, topic):
         try:
             document_content = self.docreader.run(topic)
-            # print(document_content)
-            # print([v.model_dump() for v in document_content.content.criteria])
             return document_content.content
         except Exception as e:
              print(f"there is an error with docreader agent: {e}")
@@ -192,6 +156,4 @@ if __name__ == "__main__":
     # Returns an iterator of RunResponse objects containing the generated content
     blog_post: Iterator[RunResponse] = generate_sql.run(topic, use_cache=True)
 
-    # print(blog_post, type(blog_post))
-    # Print the response
     pprint_run_response(blog_post, markdown=True)
