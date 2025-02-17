@@ -26,19 +26,15 @@ user_query =[
 
 PROMPT_TEMPLATE = """
 you are recruting participants for a clinical trial. 
+- your task is to provide summary limited to maximum of 2 sentences using the given Context {document_context} 
 - you should serve to highlight important points that may be deciding factor for potential participants who may or may not want to join.
 - Finer details about doising, schedules etc should be limited.
 - Always refer to the individual as a 'participant.'
-- Answer must fit into small infographic video that must be concise and factual.
-- Use the provided context to answer the query in a Formal way. 
-- Answer should be user readble and should be limited to maximum of 2 sentences.
 - If unsure, state that you don't know.
 - Optional details can be omitted if there isn't enough information.
 
 
-Query: {user_query}
-Context: {document_context} 
-Answer:
+
 """
 
 PDF_STORAGE_PATH = './document_store/pdfs/'
