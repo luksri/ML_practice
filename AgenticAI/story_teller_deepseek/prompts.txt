@@ -1,0 +1,113 @@
+prompt - 1:
+--------------------
+you are recruting participants for a clinical trial. create a simple infographic-style summary with the following to convince participant:
+- what is the criteria to choose the patient?
+- which is the drug under study? 
+- how the drug works on patient condition?
+- what is the medicalcare provided?
+- what are the risks involved?
+- what is the data privacy?
+- what is the pharma company that is doing the trial?
+- what is the trial period? (should be number of calendar days)
+- provide statistics to convince participant 
+- feel free to add any other important information that is mandatory.
+- don’t use the text/voice where participant can frighten/fear to participate in the study
+
+Note: create  simple infographic-style summary.
+
+
+prompt - 2:
+----------------------
+write a short video summary for patient recruitment process. the story must include all the following not limited to 1 statement:
+
+why the participant is chosen,
+what is the medical care provided, procedures, risks, data privacy, trial period (no of calendar days) and other important details.
+make sure give some statistics provided in the document to convince the participants.
+
+
+
+prompt - 3: 
+-----------------------
+
+Read the entire IRB document carefully and extract the following information:
+    1. Identify key sections, including:
+        Study Title.
+        Principal Investigator (PI) & Contact Information.
+        Purpose of the Study.
+        Eligibility Criteria (Inclusion & Exclusion).
+        Study Procedures.
+        Risks & Benefits.
+        Informed Consent Process.
+        Confidentiality & Data Protection.
+        Voluntary Participation & Withdrawal Rights.
+        Compensation (if applicable).
+        IRB Approval & Expiry Date.
+        procedures involved.
+        confidentiality measures.
+
+2. Text Processing & Summarization
+    Generate a structured summary highlighting the essential details.
+    Convert complex medical or legal terms into simple, participant-friendly language while maintaining accuracy.
+    Ensure that the summary retains all ethical considerations outlined in the document.
+
+3. Compliance Check
+    Verify that the informed consent section explicitly mentions:
+        Right to withdraw at any time without penalty.
+        Potential risks & side effects.
+        How data will be stored & protected.
+    Ensure that the study complies with ethical guidelines such as:
+        Belmont Report Principles (Respect, Beneficence, Justice).
+        HIPAA (if applicable) for data privacy.
+        FDA/ICH GCP (for clinical trials).
+
+4. Transformation for Participant Engagement
+    Convert extracted information into:
+        A participant-friendly FAQ.
+        A persuasive video script for recruitment. 
+        A simple infographic-style summary.
+
+
+prompt 4:
+-------------------
+you are recruting participants for a clinical trial.
+- Refer patient/subject as Participant only.
+- explain why participant can participate in the study?
+- what is the drug under study?
+- explain how drug works?
+- explain side effects and impacts w.r.to patient health?
+- what are the risks involved?
+- who is the sponsor for the study?
+- what is the medicalcare provided?
+- what is the trial period? (should be number of calendar days)
+- do you have any statistics for the number of participants participating?
+
+ - write a message informing participant about their eligibility for the trail due to? 
+ "participant asked to participate in the clinical research because?"
+
+create a simple infographic-style summary for all of the above.
+
+
+PROMPT_TEMPLATE = """
+you are recruting participants for a clinical trial. 
+Use the provided context to answer the query. 
+Refer patient/subject as paticipant only.
+If unsure, state that you don't know.
+all the optional queries can be skipped if there is not enough information available. 
+Be concise and factual (minimum 3 sentences).
+
+Query: {user_query}
+Context: {document_context} 
+Answer:
+"""
+
+
+
+models:
+1. deepseek r1 1.5b --> not meeting expectations for summary
+2. llama2 13b --> promoising summary 
+
+
+
+
+
+
