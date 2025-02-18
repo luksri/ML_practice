@@ -1,3 +1,8 @@
+"""
+This version is hallucinating. Not retrieving relevant information.
+"""
+
+
 import faiss
 import numpy as np
 import requests
@@ -10,7 +15,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import OllamaEmbeddings
 
 embeddings=(
-    OllamaEmbeddings(model="llama2:13b")  ##by default it ues llama2
+    OllamaEmbeddings(model="deepseek-r1:1.5b")  ##by default it ues llama2
 )
 
 LANGUAGE_MODEL = OllamaLLM(model="llama2:13b", params={"temperature": 0, "seed": 42, "top_k": 1})
@@ -45,13 +50,22 @@ def get_embedding(docs):
 def summarize_with_llm(text, vstore):
     """Retrieves relevant text using FAISS and summarizes it with an LLM."""
 
-    retrieved_text=vstore.invoke(text)
+    # retrieved_text=vstore.invoke(text)
+    retrieved_text=vstore.get_relevant_documents(text)
+
+    if not retrieved_text:  # If no results, avoid hallucination
+        return "No relevant information found in the document."
+
+    context = "\n\n".join([doc.page_content for doc in retrieved_text])
     
     prompt = f"""
     Please summarize the following clinical trial document in detail using the given context, covering the following aspects:  
     - **Participant Information**: Reason for participation, how participation can help.
-    - **Study**: goal of the study, Sponsor for the study. 
-    - **Drug Under Study**: Drug name, how it works, risks involved.
+    - **Study Goal** - If missing, state: "The document does not explicitly mention the study goal."
+    - **Sponsor** - If missing, state: "The document does not explicitly confirm the study sponsor."
+    - **Drug Under Study** - Name, function and work.
+    - **Trial Duration** - Number of days.
+    - **Side Effects** - Risks and impacts on patient health.
     - **Trial Overview**: The trial's objectives, treatment or intervention being tested, key outcomes being measured, medical care provided, trial period (calendar days).  
     - **Treatment and Dosage**: The treatment regimen being tested, including dosage, frequency, and duration of treatment.  
     - **Safety and Adverse Events**: Any adverse events (AEs) and serious adverse events (SAEs) reported, their frequency and severity, and how they were managed.  
@@ -64,9 +78,9 @@ def summarize_with_llm(text, vstore):
     - **Patient/Participant Experience**: Any insights into the participant experience, including trial procedures, expectations, and feedback from participants (if available).
 
     
-    context: {retrieved_text[0].page_content}
+    Context: {context}
     """
-    print(retrieved_text[0].page_content)
+    # print(retrieved_text)
     response = LANGUAGE_MODEL.invoke(prompt)
     
     return response

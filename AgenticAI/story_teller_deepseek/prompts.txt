@@ -99,6 +99,26 @@ Query: {user_query}
 Context: {document_context} 
 Answer:
 """
+"""
+Based on the provided clinical trial document, please answer the following questions:
+
+1. What is the primary reason a participant might choose to join this clinical trial?
+2. What is the main objective of this clinical study?
+3. Who is sponsoring this clinical trial? (If missing, state: 'The document does not explicitly confirm the study sponsor.')
+4. What is the name of the drug being tested, and how does it work?
+5. What is the total duration of the clinical trial in calendar days?
+6. What are the potential side effects and risks for participants?
+7. What treatment or intervention is being tested?
+8. What medical care is provided during the trial?
+9. What adverse events have been reported, and how are they managed?
+10. What ethical guidelines were followed in this trial?
+11. What statistical methods were used for data analysis?
+12. What are the final conclusions and recommendations of the study?
+13. What regulatory approvals or compliance measures are mentioned?
+14. What are the trial phases and milestones, and how many participants were in each phase?
+15. What insights are provided about the participant experience?
+"""
+
 
 till here, QA
 #####
