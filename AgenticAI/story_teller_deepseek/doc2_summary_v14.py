@@ -44,24 +44,6 @@ pydantic_parser=PydanticOutputParser(pydantic_object=ClinicalTrialDocument)
 format_instructions = pydantic_parser.get_format_instructions()
 
 
-# user_query = """ 
-# 1. why is it important for the participant to join the clinical trail?
-# 2. What is the primary objective of this clinical study?
-# 3. Who is sponsoring this clinical trial? If missing, state: "The document does not explicitly confirm the study sponsor."
-# 4. What is the name of the drug being tested? What is its mechanism of action?
-# 5. What is the total duration of the clinical trial for an individual participant (in days)?
-# 6. What potential side effects and risks are listed in the document for participants?
-# 7. What specific treatment or intervention is being tested in the trial?
-# 8. What medical care is provided to participants during the trial?
-# 9. What adverse events are mentioned in the document, and how are they monitored or managed?
-# 10. What ethical guidelines does the trial follow? Include references to informed consent, IRB approval, and other relevant regulations.
-# 11. What statistical methods are used for data analysis? If missing, state: "The document does not explicitly mention statistical methods."
-# 12. Does the document provide any final conclusions or recommendations based on the study? If not, mention that results are pending.
-# 13. What regulatory approvals or compliance measures are specified in the document?
-# 14. What are the phases of the trial, and how many participants are involved in each phase? If missing, state: "The document does not explicitly mention trial phases."
-# 15. Are there any insights into the participant experience mentioned in the document? Consider expectations, feedback, or participant rights.
-
-# """
 user_query = """ 
 1. Participant is considered to take part of study because of which disease condtion?
 2. What is the goal of this clinical study?
@@ -77,11 +59,12 @@ user_query = """
 
 """
 
+
 EMBED_MODEL_ID = "deepseek-ai/DeepSeek-R1"
 EMBEDDING_MODEL = OllamaEmbeddings(model="deepseek-r1:1.5b")
 DOCUMENT_VECTOR_DB = InMemoryVectorStore(EMBEDDING_MODEL)
 # LANGUAGE_MODEL = OllamaLLM(model="deepseek-r1:1.5b", params={"temperature": 0, "seed": 42, "top_k": 1})
-LANGUAGE_MODEL = OllamaLLM(model="llama3.1", params={"temperature": 0, "seed": 42, "top_k": 0, "top_p":0.9})
+LANGUAGE_MODEL = OllamaLLM(model="llama3.1", params={"temperature": 0.01, "seed": 42, "top_k": 1})
 
 
 def load_doc_documents(file_path):
@@ -125,9 +108,15 @@ def summarize_with_llm(text):
         - Trial Phases and Milestones: Breakdown of trial phases (I, II, III, IV), key milestones, and participant numbers in each phase.
         - Patient/Participant Experience: Insights into participant experiences, including trial procedures, expectations, and feedback (if available).
     
-    Keep the responses short to maximum of 3 sentences.
-    
-    Tone should be simple and humane.
+    Limit response to exactly 2 sentences. Do not mention section numbers or document structure.
+    Avoid excessive explanation—keep it short and fact-driven.
+    Always refer to the individual as a 'participant' in response.
+    Tone should be:
+        - Simplifying the language: Avoid overly technical wording unless necessary.
+        - Speaking directly to the reader: Use "you" and "we" when appropriate.
+        - Using natural phrasing: Write how you would explain it to a friend.
+        - Breaking up long sentences: Shorter sentences feel more approachable.
+
 
     User Interaction :
         Once the clinical trial context is processed, you should respond accurately to user queries. If a query is outside the provided context, state so clearly.
@@ -155,28 +144,29 @@ def parse_answers(response_text):
     return answers
 
 
-raw_docs = load_doc_documents('./HRP-503 - SAMPLE Biomedical Protocol.docx')
-# raw_docs = load_doc_documents('./ex.docx')
+raw_docs = load_doc_documents('./ex.docx')
 vstore = get_embedding(raw_docs)
 
 
-summary = summarize_with_llm(user_query)    
-final_answer = re.sub(r'<think>.*?</think>', '', summary, flags=re.DOTALL).strip()
-print(final_answer)
-# for ques in user_query.split("\n"):
-#     print(f"------ User question : {ques} ------")
-#     summary = summarize_with_llm(ques)    
-#     final_answer = re.sub(r'<think>.*?</think>', '', summary, flags=re.DOTALL).strip()
-#     print(final_answer)
-#     print("######################End of Answer###################################")
+# summary = summarize_with_llm(user_query)    
+# final_answer = re.sub(r'<think>.*?</think>', '', summary, flags=re.DOTALL).strip()
+# print(final_answer)
+question_dict = dict()
+for ques in user_query.split("\n"):
+    print(f"------ User question : {ques} ------")
+    summary = summarize_with_llm(ques)    
+    final_answer = re.sub(r'<think>.*?</think>', '', summary, flags=re.DOTALL).strip()
+    print(final_answer)
+    if ques and ques != ' ':
+        question_dict[ques] = final_answer
+    print("######################End of Answer###################################")
 
-parsed_answers = parse_answers(final_answer)
-print(parsed_answers)
+# parsed_answers = parse_answers(final_answer)
+print(question_dict)
 
 image_num = 1
 video_dict = dict()
-text_dict = dict()
-for question, answer in parsed_answers.items():
+for question, answer in question_dict.items():
     print(f"{question}\n{answer.strip()}\n")
     prompt = f"create a cartoon image for {question}"
     image_name = f"./image_gen/{image_num}.png"
@@ -184,10 +174,8 @@ for question, answer in parsed_answers.items():
     image_num += 1
     if answer:
         video_dict[question]=image_name
-        text_dict[question] = answer
 
-print(text_dict)
-if video_dict and text_dict:
-    video_gen(list(text_dict.values()), list(video_dict.values()), video_name="stroy_v13")
+if video_dict and question_dict:
+    video_gen(list(question_dict.values()), list(video_dict.values()), video_name="stroy_v14_1")
 else:
-    print(f"dicts are empty: {len(video_dict), {len(text_dict)}}")
+    print(f"dicts are empty: {len(video_dict), {len(question_dict)}}")
