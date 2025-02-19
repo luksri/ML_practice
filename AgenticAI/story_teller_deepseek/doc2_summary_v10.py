@@ -124,8 +124,12 @@ for question, answer in parsed_answers.items():
     image_name = f"./image_gen/{image_num}.png"
     # generate_infographic(prompt, image_name)
     image_num += 1
-    video_dict[question]=image_name
-    text_dict[question] = answer
+    if answer:
+        video_dict[question]=image_name
+        text_dict[question] = answer
 
 print(text_dict)
-video_gen(list(text_dict.values()), list(video_dict.values()))
+if video_dict and text_dict:
+    video_gen(list(text_dict.values()), list(video_dict.values()))
+else:
+    print(f"dicts are empty: {len(video_dict), {len(text_dict)}}")

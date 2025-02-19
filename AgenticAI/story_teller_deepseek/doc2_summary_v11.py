@@ -10,25 +10,50 @@ from docling.chunking import HybridChunker
 import pandas as pd
 
 from text_to_image_v2 import generate_infographic
+from video_gen import video_gen
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from langchain.output_parsers import PydanticOutputParser
+from langchain_core.prompts import PromptTemplate
 
-user_query = [
-"1. Why might a participant choose to join this clinical trial? Consider motivations such as potential benefits, contribution to medical research, or personal health improvements.",
-"2. What is the primary objective of this clinical study? Clearly state whether the study is evaluating a new drug, treatment method, or specific outcomes.",
-"3. Who is sponsoring this clinical trial? If missing, state: 'The document does not explicitly confirm the study sponsor.'",
-"4. What is the name of the drug being tested? What is its mechanism of action?",
-"5. What is the total duration of the clinical trial for an individual participant (in days)?",
-"6. What potential side effects and risks are listed in the document for participants?",
-"7. What specific treatment or intervention is being tested in the trial?",
-"8. What medical care is provided to participants during the trial? Mention routine procedures such as check-ups, lab tests, and monitoring.",
-"9. What adverse events are mentioned in the document, and how are they monitored or managed?",
-"10. What ethical guidelines does the trial follow? Include references to informed consent, IRB approval, and other relevant regulations.",
-"11. What statistical methods are used for data analysis? If missing, state: 'The document does not explicitly mention statistical methods.'",
-"12. Does the document provide any final conclusions or recommendations based on the study? If not, mention that results are pending.",
-"13. What regulatory approvals or compliance measures are specified in the document?",
-"14. What are the phases of the trial, and how many participants are involved in each phase? If missing, state: 'The document does not explicitly mention trial phases.'",
-"15. Are there any insights into the participant experience mentioned in the document? Consider expectations, feedback, or participant rights."
-]
-PROMPT_TEMPLATE = """
+class ClinicalTrialDocument(BaseModel):
+    ParticipantInformation:str=Field(None,description="Reason for participation, how participation can help.")
+    Study:str=Field(None,description="goal of the study, Sponsor for the study")
+    DrugUnderStudy:str=Field(None,description="Drug name, how it works, risks involved")
+    TrialOverview:str=Field(None,description="The trial's objectives, treatment or intervention being tested, key outcomes being measured, medical care provided, trial period (calendar days)")
+    TreatmentDosage:str=Field(None,description="The treatment regimen being tested, including dosage, frequency, and duration of treatment")
+    SafetyAdverseEvents:str=Field(None,description="Any adverse events (AEs) and serious adverse events (SAEs) reported, their frequency and severity, and how they were managed")
+    EfficacyResults:str=Field(None,description="Key findings on the efficacy of the treatment, including comparison to placebo or standard of care, and any statistical analysis performed")
+    EthicalConsiderations:str=Field(None,description="Ethical guidelines followed, informed consent procedures, and any other ethical concerns addressed in the trial")
+    StatisticalMethods:str=Field(None,description="The statistical techniques used for data analysis, including any major statistical tests and how outcomes were measured")
+    ConclusionRecommendations:str=Field(None,description="The final conclusions of the trial, including whether the treatment was successful, any recommendations for future research, and any potential next steps (e.g., regulatory approval)")
+    RegulatoryCompliance:str=Field(None,description="Any regulatory approvals or compliance measures mentioned, such as adherence to FDA or EMA guidelines")
+    TrialPhasesMilestones:str=Field(None,description="The phases of the trial (I, II, III, IV), key milestones, and the number of participants in each phase")
+    ParticipantExperience:str=Field(None,description="Any insights into the participant experience, including trial procedures, expectations, and feedback from participants (if available)")
+
+pydantic_parser=PydanticOutputParser(pydantic_object=ClinicalTrialDocument)
+format_instructions = pydantic_parser.get_format_instructions()
+
+
+user_query = """ 
+1. Why might a participant choose to join this clinical trial? Consider motivations such as potential benefits, contribution to medical research, or personal health improvements.
+2. What is the primary objective of this clinical study? Clearly state whether the study is evaluating a new drug, treatment method, or specific outcomes.
+3. Who is sponsoring this clinical trial? If missing, state: "The document does not explicitly confirm the study sponsor."
+4. What is the name of the drug being tested? What is its mechanism of action?
+5. What is the total duration of the clinical trial for an individual participant (in days)?
+6. What potential side effects and risks are listed in the document for participants?
+7. What specific treatment or intervention is being tested in the trial?
+8. What medical care is provided to participants during the trial? Mention routine procedures such as check-ups, lab tests, and monitoring.
+9. What adverse events are mentioned in the document, and how are they monitored or managed?
+10. What ethical guidelines does the trial follow? Include references to informed consent, IRB approval, and other relevant regulations.
+11. What statistical methods are used for data analysis? If missing, state: "The document does not explicitly mention statistical methods."
+12. Does the document provide any final conclusions or recommendations based on the study? If not, mention that results are pending.
+13. What regulatory approvals or compliance measures are specified in the document?
+14. What are the phases of the trial, and how many participants are involved in each phase? If missing, state: "The document does not explicitly mention trial phases."
+15. Are there any insights into the participant experience mentioned in the document? Consider expectations, feedback, or participant rights.
+
+"""
+PROMPT_TEMPLATE = PromptTemplate.from_template("""
     You are an expert in clinical trials and medical research. 
     - Your task is to analyze the provided document and answer user queries in a formal, concise, and informative manner.
     - Use the provided document context to answer the questions.
@@ -38,17 +63,19 @@ PROMPT_TEMPLATE = """
     - Do not infer or fabricate information beyond what is provided in the document.
     - Maintain clarity, accuracy, and a patient-friendly tone when necessary.
     
-    Query: {user_query}
-    Context: {document_context} 
-    Answer:
+    Question: {user_query}
+    Context: {document_context}
+    Answer: 
 
-"""
+""",
+partial_variables={"format_instructions": format_instructions})
+
 
 PDF_STORAGE_PATH = './document_store/pdfs/'
 EMBEDDING_MODEL = OllamaEmbeddings(model="llama3.2:1b")
 DOCUMENT_VECTOR_DB = InMemoryVectorStore(EMBEDDING_MODEL)
 # LANGUAGE_MODEL = OllamaLLM(model="deepseek-r1:1.5b", params={"temperature": 0, "seed": 42, "top_k": 1})
-LANGUAGE_MODEL = OllamaLLM(model="llama3.2:1b", params={"temperature": 0, "seed": 42, "top_k": 1})
+LANGUAGE_MODEL = OllamaLLM(model="llama3.2:1b", params={"temperature": 0.01, "seed": 42, "top_k": 0,"top_p":0.9})
 
 
 def save_uploaded_file(uploaded_file):
@@ -82,23 +109,52 @@ def find_related_documents(query):
 
 def generate_answer(user_query, context_documents):
     context_text = "\n\n".join([doc.page_content for doc in context_documents])
-    conversation_prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-    response_chain = conversation_prompt | LANGUAGE_MODEL
+    # conversation_prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    response_chain = PROMPT_TEMPLATE | LANGUAGE_MODEL
     return response_chain.invoke({"user_query": user_query, "document_context": context_text})
+
+def parse_answers(response_text):
+    # Split answers using the numbered format "1.", "2.", etc.
+    answers = {}
+    split_responses = response_text.split("\n")
+    
+    current_question = None
+    for line in split_responses:
+        line = line.strip()
+        if line and line[0].isdigit() and "." in line[:3]:  # Check for question numbering
+            current_question = line  # Store the question as the key
+            answers[current_question] = ""
+        elif current_question:  # Append text to the current question's answer
+            answers[current_question] += line + " "
+
+    return answers
+
 
 raw_docs = load_doc_documents('./HRP-503 - SAMPLE Biomedical Protocol.docx')
 processed_chunks = chunk_documents(raw_docs)
 index_documents(processed_chunks)
-# relevant_docs = find_related_documents(user_query)
-# res = generate_answer(user_query, relevant_docs)
-# print(res)
-response_dict = dict()
-for idx, each_q in enumerate(user_query):
-    relevant_docs = find_related_documents(each_q)
-    response_dict[idx] = generate_answer(each_q, relevant_docs)
-print(response_dict)
+relevant_docs = find_related_documents(user_query)
+res = generate_answer(user_query, relevant_docs)
+print(res)
+# Parse the structured response
+parsed_answers = parse_answers(res)
 
-df = pd.DataFrame(list(response_dict.items()), columns=['Query', 'Answer'])
-# pd.ExcelWriter(df)
-df.to_excel('qa.xlsx', index=False)
+# Print answers per question
+image_num = 1
+video_dict = dict()
+text_dict = dict()
+for question, answer in parsed_answers.items():
+    print(f"{question}\n{answer.strip()}\n")
+    prompt = f"create a cartoon image for {question}"
+    image_name = f"./image_gen/{image_num}.png"
+    # generate_infographic(prompt, image_name)
+    image_num += 1
+    if answer:
+        video_dict[question]=image_name
+        text_dict[question] = answer
 
+print(text_dict)
+if video_dict and text_dict:
+    video_gen(list(text_dict.values()), list(video_dict.values()), 'story_top_p_0')
+else:
+    print(f"dicts are empty: {len(video_dict), {len(text_dict)}}")

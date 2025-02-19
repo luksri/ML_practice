@@ -11,7 +11,7 @@ text_only_pat = re.compile(r'[^a-zA-Z0-9,\s]')
 output_dir = "./video"
 os.makedirs(output_dir, exist_ok=True)
 
-def video_gen(texts,image_file_names):
+def video_gen(texts,image_file_names, video_name):
     audio = []
     for i, text in enumerate(texts):
         if text.strip():
@@ -37,6 +37,6 @@ def video_gen(texts,image_file_names):
     ## concatenate image clips into video
     video = concatenate_videoclips(image_clips, method='compose').with_audio(
         concatenate_audioclips([clip for clip in audio if clip]))
-    output_video = f'{output_dir}/story_with_gtts1.mp4'
+    output_video = f'{output_dir}/{video_name}.mp4'
     video.write_videofile(output_video, fps=24, codec='libx264', audio_codec='aac')
     print(f"video saved")
