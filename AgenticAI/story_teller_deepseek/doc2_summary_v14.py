@@ -144,7 +144,7 @@ def parse_answers(response_text):
     return answers
 
 
-raw_docs = load_doc_documents('./ex.docx')
+raw_docs = load_doc_documents('./HRP-503 - SAMPLE Biomedical Protocol.docx')
 vstore = get_embedding(raw_docs)
 
 
