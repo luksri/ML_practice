@@ -99,7 +99,7 @@ def summarize_with_llm(text):
     return summary
 
 
-raw_docs = load_doc_documents('./ex.docx')
+raw_docs = load_doc_documents('./HRP-503 - SAMPLE Biomedical Protocol.docx')
 summary = summarize_with_llm(raw_docs)    
 parsed_output = pydantic_parser.parse(summary)
 rich.print(parsed_output.model_dump())
@@ -107,13 +107,13 @@ rich.print(parsed_output.model_dump())
 image_num = 1
 video_dict = dict()
 for text, summ in parsed_output.model_dump().items():
-    prompt = f"A colorful, cartoon-style infographic illustrating '{text}'. {summ}. The image should be visually engaging, using simple characters, medical symbols, and a friendly, informative tone."
+    prompt = f"A colorful, cartoon-style infographic illustrating {summ}. The image should be visually engaging, using simple characters, medical symbols, and a friendly, informative tone."
     image_name = f"./image_gen/{image_num}.png"
     generate_infographic(prompt, image_name)
     video_dict[summ]=image_name 
     image_num += 1
 
 if video_dict:
-    video_gen(list(video_dict.keys()), list(video_dict.values()), video_name="stroy_v16_openai")
+    video_gen(list(video_dict.keys()), list(video_dict.values()), video_name="stroy_v16_openai_1")
 else:
     print(f"dicts are empty: {len(video_dict), {len(video_dict)}}")

@@ -1,0 +1,42 @@
+CREATE TABLE Patients (
+    patient_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    dob DATE NOT NULL,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,
+    contact_info VARCHAR(255),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Diseases (
+    disease_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+);
+
+CREATE TABLE Medications (
+    medication_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    dosage VARCHAR(50),  -- e.g., "500mg", "2 tablets/day"
+    description TEXT
+);
+
+CREATE TABLE Patient_Diseases (
+    patient_id INT,
+    disease_id INT,
+    diagnosis_date DATE NOT NULL,
+    PRIMARY KEY (patient_id, disease_id),
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE,
+    FOREIGN KEY (disease_id) REFERENCES Diseases(disease_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Patient_Medications (
+    patient_id INT,
+    medication_id INT,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    dosage VARCHAR(50),
+    PRIMARY KEY (patient_id, medication_id, start_date),
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE,
+    FOREIGN KEY (medication_id) REFERENCES Medications(medication_id) ON DELETE CASCADE
+);

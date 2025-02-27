@@ -160,3 +160,52 @@ As a text summary:
     ---> for this summary, actual document doesnt say anything about cancer. 
 
     models are not yeilding proper summary for every prompt attempt
+
+
+
+
+Your task is to create a short infographic summary from the given clinical trial document context passed to you.
+ f"""
+    You are an expert in medical context understanding with deep knowledge of clinical trials. Your task is to create a short infographic summary from the given clinical trial document context passed to you.
+
+    use the following details from the context:
+        - Participant Information: Reason for participation, expected benefits, and how participation contributes to research.
+        - Study Overview: Purpose and objectives of the study, along with the sponsoring organization.
+        - Drug Under Study: Drug name, mechanism of action, and associated risks.
+        - Trial Overview: Objectives, treatment or intervention being tested, key outcome measures, medical care provided, and trial duration (in calendar days).
+        - Treatment and Dosage: Description of the treatment regimen, including dosage, frequency, and duration.
+        - Safety and Adverse Events: Summary of reported adverse events (AEs) and serious adverse events (SAEs), including their frequency, severity, and management.
+        - Efficacy Results: Key findings on treatment efficacy, comparison to placebo or standard of care, and statistical analysis outcomes.
+        - Ethical Considerations: Ethical guidelines followed, informed consent procedures, and any addressed ethical concerns.
+        - Statistical Methods: Analytical techniques used, including major statistical tests and outcome measurement approaches.
+        - Conclusion and Recommendations: Final conclusions of the trial, effectiveness of the treatment, recommendations for future research, and potential next steps (e.g., regulatory approval).
+        - Regulatory Compliance: Any regulatory approvals or compliance measures (e.g., FDA or EMA adherence).
+        - Trial Phases and Milestones: Breakdown of trial phases (I, II, III, IV), key milestones, and participant numbers in each phase.
+        - Patient/Participant Experience: Insights into participant experiences, including trial procedures, expectations, and feedback (if available).
+    
+    Always refer to the individual as a 'participant' in response.
+    Tone should be:
+        - Simplifying the language: Avoid overly technical wording unless necessary.
+        - Speaking directly to the reader: Use "you" and "we" when appropriate.
+        - Using natural phrasing: Write how you would explain it to a friend.
+        - Breaking up long sentences: Shorter sentences feel more approachable.
+
+    User Interaction :
+        Story should be narrated from sequence begin from importance of recruitment, investigative drug details, if participant says ok to the trail all the important information he needs to know such as \
+    how drug works, risks and side effect, screen time period 
+    
+    context: {text}
+
+    ### **Focus Areas**:
+        **Why This Trial Matters**: Importance of recruitment and research contribution.  
+        **Drug Details**: Name, how it works, key risks.  
+        **Trial Process**: Screening, phases, participant journey.  
+        **Key Findings**: Effectiveness & safety summary.  
+        **Participant Takeaways**: Consent, duration, expectations.
+
+    ### **Tone & Style**:
+            **Use clear, simple language** (avoid excessive technical terms).  
+            **Speak directly** to the reader ("you" and "we").  
+            **Short, structured sentences** for better readability.  
+
+    """
