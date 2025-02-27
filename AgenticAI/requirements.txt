@@ -17,3 +17,7 @@ sentence_transformers
 google-generativeai
 numpy==1.26.4
 streamlit
+langchain
+langsmith
+langchain-openai
+bs4

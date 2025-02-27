@@ -1,0 +1,52 @@
+import streamlit as st
+from io import StringIO
+# from docx import Document
+import PyPDF2
+
+# def read_docx(file):
+#     doc = Document(file)
+#     return "\n".join([para.text for para in doc.paragraphs])
+
+def generate_response(text):
+    return f"Processed Response:\n{text[:500]}..."  # Example processing, truncate for display
+
+def read_pdf(file):
+    # reader = PyPDF2.PdfReader(file)
+    # return "\n".join([page.extract_text() for page in reader.pages if page.extract_text()])
+    return "pdf uploaded successfully"
+
+def main():
+    st.title("Write or Upload a Document")
+    
+    uploaded_file = st.file_uploader("Attach a .docx, .txt, or .pdf file", type=["docx", "txt", "pdf"])
+    user_text = st.text_area("Write your text here:")
+    
+    if uploaded_file is not None:
+        if uploaded_file.type == "text/plain":
+            content = StringIO(uploaded_file.getvalue().decode("utf-8")).read()
+        # elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        #     content = read_docx(uploaded_file)
+        elif uploaded_file.type == "application/pdf":
+            content = read_pdf(uploaded_file)
+        else:
+            content = "Unsupported file format."
+        
+        st.write("### Attached Document Content:")
+        st.write(content)
+    
+    if user_text:
+        st.write("### Your Text:")
+        st.write(user_text)
+
+    if st.button("Generate Response"):
+        full_text = user_text if user_text else content
+        if full_text:
+            response = generate_response(full_text)
+            st.write("### Response:")
+            st.write(response)
+        else:
+            st.warning("Please provide text or upload a document.")
+
+
+if __name__ == "__main__":
+    main()
