@@ -1,0 +1,11 @@
+{
+  "dockerfile_lines": [],
+  "graphs": {
+    "groq_agent": "./dap5.py:agent"
+  },
+  "env": "../.env",
+  "python_version": "3.12",
+  "dependencies": [
+    "."
+  ]
+}

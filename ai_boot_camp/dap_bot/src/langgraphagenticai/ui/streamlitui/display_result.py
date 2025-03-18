@@ -39,4 +39,14 @@ class DisplayResultStreamlit:
                 elif type(message)==AIMessage and message.content:
                     with st.chat_message("assistant"):
                         st.write(message.content)
+
+        elif usecase =="HealthChatbot":
+            for event in graph.stream({'messages':("user",user_message)}):
+                    print(event.values())
+                    for value in event.values():
+                        print(value['messages'])
+                        with st.chat_message("user"):
+                            st.write(user_message)
+                        with st.chat_message("assistant"):
+                            st.write(value["messages"].content)
              
