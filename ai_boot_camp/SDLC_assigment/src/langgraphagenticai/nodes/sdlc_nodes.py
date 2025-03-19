@@ -24,13 +24,14 @@ class SDLCNode:
         for message in res:
             if type(message) == HumanMessage:
                     msg = message.content
+                    msg = eval(msg)
             elif type(message)==ToolMessage:
                     pass
-            elif type(message)==AIMessage and message.content:
-                    pass
-        print(msg)
-        if msg:
-             msg = eval(msg)
+            elif type(message)==AIMessage:
+                    msg = message.content
+        # print(msg)
+        # if msg:
+        #      msg = eval(msg)
         return msg
     
     def process(self, state: State) -> dict:
@@ -68,12 +69,22 @@ class SDLCNode:
 
                     Ensure clarity, correctness, and alignment with Agile best practices.  
                     If a requirement is vague, assume reasonable details to create a meaningful user story.  
+
+                    **Do not add thought process, analysis. simply output user stories.**
+                    output the user stories in a list format.
                 """
         user_prompt = f"""
                         Here are the system requirements: {state["user_requirements"]}
                         Convert these into user stories.
                     """
         user_stories = self.llm.invoke(System_prompt + user_prompt)
-        print(user_stories)
+        
+        # print(user_stories, "\n")
+        if user_stories:
+            # unpack_us = SDLCNode.unpack_messages(user_stories)
+            unpack_us = user_stories.content
+            # print(unpack_us)
+            us_list = unpack_us.split("\n")
+            self.vstore.add_ustories(us_list)
         return {'user_stories': user_stories}
 

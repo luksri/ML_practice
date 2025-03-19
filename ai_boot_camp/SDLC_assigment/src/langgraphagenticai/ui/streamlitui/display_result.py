@@ -78,8 +78,8 @@ class DisplayResultStreamlit_sdlc:
         self.graph = graph
 
     def display_sdlc_output(self, data, workflow_id, req_flag=False, story_flag=False):
-        print("\n\n data is \n\n")
-        print(data)
+        # print("\n\n data is \n\n")
+        # print(data)
         if workflow_id == 1 and req_flag:
             st.write(data['user_requirements'])
         elif workflow_id == 2 and story_flag:

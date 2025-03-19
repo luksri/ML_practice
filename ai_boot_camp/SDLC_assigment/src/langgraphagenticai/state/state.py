@@ -9,4 +9,4 @@ class State(TypedDict):
     """
     messages: Annotated[list, add_messages]
     user_requirements: List[str]
-    user_stories: str
+    user_stories: List[str]
