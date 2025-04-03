@@ -1,0 +1,211 @@
+prompt - 1:
+--------------------
+you are recruting participants for a clinical trial. create a simple infographic-style summary with the following to convince participant:
+- what is the criteria to choose the patient?
+- which is the drug under study? 
+- how the drug works on patient condition?
+- what is the medicalcare provided?
+- what are the risks involved?
+- what is the data privacy?
+- what is the pharma company that is doing the trial?
+- what is the trial period? (should be number of calendar days)
+- provide statistics to convince participant 
+- feel free to add any other important information that is mandatory.
+- don’t use the text/voice where participant can frighten/fear to participate in the study
+
+Note: create  simple infographic-style summary.
+
+
+prompt - 2:
+----------------------
+write a short video summary for patient recruitment process. the story must include all the following not limited to 1 statement:
+
+why the participant is chosen,
+what is the medical care provided, procedures, risks, data privacy, trial period (no of calendar days) and other important details.
+make sure give some statistics provided in the document to convince the participants.
+
+
+
+prompt - 3: 
+-----------------------
+
+Read the entire IRB document carefully and extract the following information:
+    1. Identify key sections, including:
+        Study Title.
+        Principal Investigator (PI) & Contact Information.
+        Purpose of the Study.
+        Eligibility Criteria (Inclusion & Exclusion).
+        Study Procedures.
+        Risks & Benefits.
+        Informed Consent Process.
+        Confidentiality & Data Protection.
+        Voluntary Participation & Withdrawal Rights.
+        Compensation (if applicable).
+        IRB Approval & Expiry Date.
+        procedures involved.
+        confidentiality measures.
+
+2. Text Processing & Summarization
+    Generate a structured summary highlighting the essential details.
+    Convert complex medical or legal terms into simple, participant-friendly language while maintaining accuracy.
+    Ensure that the summary retains all ethical considerations outlined in the document.
+
+3. Compliance Check
+    Verify that the informed consent section explicitly mentions:
+        Right to withdraw at any time without penalty.
+        Potential risks & side effects.
+        How data will be stored & protected.
+    Ensure that the study complies with ethical guidelines such as:
+        Belmont Report Principles (Respect, Beneficence, Justice).
+        HIPAA (if applicable) for data privacy.
+        FDA/ICH GCP (for clinical trials).
+
+4. Transformation for Participant Engagement
+    Convert extracted information into:
+        A participant-friendly FAQ.
+        A persuasive video script for recruitment. 
+        A simple infographic-style summary.
+
+
+prompt 4:
+-------------------
+you are recruting participants for a clinical trial.
+- Refer patient/subject as Participant only.
+- explain why participant can participate in the study?
+- what is the drug under study?
+- explain how drug works?
+- explain side effects and impacts w.r.to patient health?
+- what are the risks involved?
+- who is the sponsor for the study?
+- what is the medicalcare provided?
+- what is the trial period? (should be number of calendar days)
+- do you have any statistics for the number of participants participating?
+
+ - write a message informing participant about their eligibility for the trail due to? 
+ "participant asked to participate in the clinical research because?"
+
+create a simple infographic-style summary for all of the above.
+
+
+PROMPT_TEMPLATE = """
+you are recruting participants for a clinical trial. 
+Use the provided context to answer the query. 
+Refer patient/subject as paticipant only.
+If unsure, state that you don't know.
+all the optional queries can be skipped if there is not enough information available. 
+Be concise and factual (minimum 3 sentences).
+
+Query: {user_query}
+Context: {document_context} 
+Answer:
+"""
+"""
+Based on the provided clinical trial document, please answer the following questions:
+
+1. What is the primary reason a participant might choose to join this clinical trial?
+2. What is the main objective of this clinical study?
+3. Who is sponsoring this clinical trial? (If missing, state: 'The document does not explicitly confirm the study sponsor.')
+4. What is the name of the drug being tested, and how does it work?
+5. What is the total duration of the clinical trial in calendar days?
+6. What are the potential side effects and risks for participants?
+7. What treatment or intervention is being tested?
+8. What medical care is provided during the trial?
+9. What adverse events have been reported, and how are they managed?
+10. What ethical guidelines were followed in this trial?
+11. What statistical methods were used for data analysis?
+12. What are the final conclusions and recommendations of the study?
+13. What regulatory approvals or compliance measures are mentioned?
+14. What are the trial phases and milestones, and how many participants were in each phase?
+15. What insights are provided about the participant experience?
+"""
+
+
+till here, QA
+#####
+
+### this is with text summary.
+prompt = f"""
+Please summarize the following clinical trial document in detail, covering the following aspects:  
+- **Trial Overview**: The trial's objectives, design (randomized, placebo-controlled, etc.), treatment or intervention being tested, and key outcomes being measured.  
+- **Participant Information**: Inclusion and exclusion criteria, participant demographics (age, gender, health status), and sample size.  
+- **Treatment and Dosage**: The treatment regimen being tested, including dosage, frequency, and duration of treatment.  
+- **Safety and Adverse Events**: Any adverse events (AEs) and serious adverse events (SAEs) reported, their frequency and severity, and how they were managed.  
+- **Efficacy Results**: Key findings on the efficacy of the treatment, including comparison to placebo or standard of care, and any statistical analysis performed.  
+- **Ethical Considerations**: Ethical guidelines followed, informed consent procedures, and any other ethical concerns addressed in the trial.  
+- **Statistical Methods**: The statistical techniques used for data analysis, including any major statistical tests and how outcomes were measured.  
+- **Conclusion and Recommendations**: The final conclusions of the trial, including whether the treatment was successful, any recommendations for future research, and any potential next steps (e.g., regulatory approval).  
+- **Regulatory Compliance**: Any regulatory approvals or compliance measures mentioned, such as adherence to FDA or EMA guidelines.  
+- **Trial Phases and Milestones**: The phases of the trial (I, II, III, IV), key milestones, and the number of participants in each phase.  
+- **Patient/Participant Experience**: Any insights into the participant experience, including trial procedures, expectations, and feedback from participants (if available).
+
+Context: {context}
+"""
+
+                             Only summarize information explicitly mentioned in the document.
+models:
+1. deepseek r1 1.5b --> not meeting expectations for summary
+2. llama2 13b --> promoising summary 
+
+
+
+As a text summary:
+1. using llama2 13b (for both embedding and query) --> model is hallucinating.
+    ex: 
+    The drug under study is teriflunomide, an oral medication that works by inhibiting the enzyme dihydroorotate dehydrogenase. 
+    This enzyme plays a key role in the synthesis of nucleotides, which are essential for cell growth and division. 
+    By blocking the activity of this enzyme, teriflunomide can slow down the growth of cancer cells and potentially 
+    treat the condition. However, there is also a risk of adverse events, such as nausea, diarrhea, and liver damage, 
+    which will be closely monitored throughout the study.
+
+    ---> for this summary, actual document doesnt say anything about cancer. 
+
+    models are not yeilding proper summary for every prompt attempt
+
+
+
+
+Your task is to create a short infographic summary from the given clinical trial document context passed to you.
+ f"""
+    You are an expert in medical context understanding with deep knowledge of clinical trials. Your task is to create a short infographic summary from the given clinical trial document context passed to you.
+
+    use the following details from the context:
+        - Participant Information: Reason for participation, expected benefits, and how participation contributes to research.
+        - Study Overview: Purpose and objectives of the study, along with the sponsoring organization.
+        - Drug Under Study: Drug name, mechanism of action, and associated risks.
+        - Trial Overview: Objectives, treatment or intervention being tested, key outcome measures, medical care provided, and trial duration (in calendar days).
+        - Treatment and Dosage: Description of the treatment regimen, including dosage, frequency, and duration.
+        - Safety and Adverse Events: Summary of reported adverse events (AEs) and serious adverse events (SAEs), including their frequency, severity, and management.
+        - Efficacy Results: Key findings on treatment efficacy, comparison to placebo or standard of care, and statistical analysis outcomes.
+        - Ethical Considerations: Ethical guidelines followed, informed consent procedures, and any addressed ethical concerns.
+        - Statistical Methods: Analytical techniques used, including major statistical tests and outcome measurement approaches.
+        - Conclusion and Recommendations: Final conclusions of the trial, effectiveness of the treatment, recommendations for future research, and potential next steps (e.g., regulatory approval).
+        - Regulatory Compliance: Any regulatory approvals or compliance measures (e.g., FDA or EMA adherence).
+        - Trial Phases and Milestones: Breakdown of trial phases (I, II, III, IV), key milestones, and participant numbers in each phase.
+        - Patient/Participant Experience: Insights into participant experiences, including trial procedures, expectations, and feedback (if available).
+    
+    Always refer to the individual as a 'participant' in response.
+    Tone should be:
+        - Simplifying the language: Avoid overly technical wording unless necessary.
+        - Speaking directly to the reader: Use "you" and "we" when appropriate.
+        - Using natural phrasing: Write how you would explain it to a friend.
+        - Breaking up long sentences: Shorter sentences feel more approachable.
+
+    User Interaction :
+        Story should be narrated from sequence begin from importance of recruitment, investigative drug details, if participant says ok to the trail all the important information he needs to know such as \
+    how drug works, risks and side effect, screen time period 
+    
+    context: {text}
+
+    ### **Focus Areas**:
+        **Why This Trial Matters**: Importance of recruitment and research contribution.  
+        **Drug Details**: Name, how it works, key risks.  
+        **Trial Process**: Screening, phases, participant journey.  
+        **Key Findings**: Effectiveness & safety summary.  
+        **Participant Takeaways**: Consent, duration, expectations.
+
+    ### **Tone & Style**:
+            **Use clear, simple language** (avoid excessive technical terms).  
+            **Speak directly** to the reader ("you" and "we").  
+            **Short, structured sentences** for better readability.  
+
+    """

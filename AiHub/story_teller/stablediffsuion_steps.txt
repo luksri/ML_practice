@@ -1,0 +1,54 @@
+🛠️ Method 1: Install AUTOMATIC1111 Web UI on Mac
+
+This is the most popular way to use Stable Diffusion.
+✅ Step 1: Install Homebrew & Dependencies
+
+Open Terminal and run:
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install cmake protobuf rust python@3.10 git wget
+
+✅ Step 2: Clone Stable Diffusion Web UI
+
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+cd stable-diffusion-webui
+
+✅ Step 3: Download a Stable Diffusion Model
+
+You need at least one model to generate images.
+
+    Go to: CivitAI or Hugging Face
+    Download a model like SDXL 1.0 or AnythingV5
+    Place it inside:
+
+    stable-diffusion-webui/models/Stable-diffusion/
+
+✅ Step 4: Run Stable Diffusion Web UI
+
+Now, launch it:
+
+python launch.py --no-half --skip-torch-cuda-test
+
+🟢 After a few minutes, it will show:
+
+Running on local URL: http://127.0.0.1:7860
+
+✅ Open http://127.0.0.1:7860 in your browser and start generating images!
+
+
+
+🔹 Where to Download Checkpoints?
+
+    Hugging Face: https://huggingface.co/CompVis
+    CivitAI: https://civitai.com/
+    Automatic1111 Discord/Community Models
+
+🔹 How to Use Checkpoints in Stable Diffusion?
+
+    Download the .ckpt or .safetensors file
+    Move it to the models/Stable-diffusion/ folder inside your Stable Diffusion directory.
+
+mv model.ckpt ~/stable-diffusion-webui/models/Stable-diffusion/
+
+Restart Stable Diffusion WebUI
+Select the model in the WebUI or API settings
